@@ -91,7 +91,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -102,7 +102,7 @@ vim.g.have_nerd_font = false
 vim.opt.number = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
--- vim.opt.relativenumber = true
+vim.opt.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
@@ -288,7 +288,9 @@ require('lazy').setup({
         ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
         ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
         ['<leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
+        ['<leader>v'] = { name = '[V]iew', _ = 'which_key_ignore' },
       }
+
       -- visual mode
       require('which-key').register({
         ['<leader>h'] = { 'Git [H]unk' },
@@ -592,7 +594,35 @@ require('lazy').setup({
             },
           },
         },
+        html = {},
+        cssls = {},
+        css_variables = {
+          filetypes = { 'css', 'vue' },
+          settings = {
+            lookupFiles = { '**/variables/*.css' },
+          },
+        },
+        volar = {},
+        -- vuels = {},
       }
+
+      local function tailwindcss_config_exists()
+        local paths = { '.', 'app' }
+        local files = { 'tailwind.config.js', 'tailwind.config.cjs', 'tailwind.config.ts', 'tailwind.config.json' }
+        for _, path in ipairs(paths) do
+          for _, file in ipairs(files) do
+            local filepath = path .. '/' .. file
+            if vim.fn.filereadable(filepath) == 1 then
+              return true
+            end
+          end
+        end
+        return false
+      end
+
+      if tailwindcss_config_exists() then
+        servers['tailwindcss'] = {}
+      end
 
       -- Ensure the servers and tools above are installed
       --  To check the current status of installed tools and/or manually install
@@ -607,6 +637,9 @@ require('lazy').setup({
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
+        'eslint_d',
+        'stylelint',
+        'prettierd',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -622,6 +655,32 @@ require('lazy').setup({
           end,
         },
       }
+
+      -- local function toggle_vue_lsp()
+      --   local lspconfig = require 'lspconfig'
+      --   local bufnr = vim.api.nvim_get_current_buf()
+      --   local clients = vim.lsp.get_clients { bufnr = bufnr }
+      --   for _, client in ipairs(clients) do
+      --     if client.name == 'volar' then
+      --       vim.lsp.stop_client(client.id)
+      --       lspconfig.vuels.setup()
+      --       print 'Switched to vuels (Vue 2)'
+      --       return
+      --     elseif client.name == 'vuels' then
+      --       vim.lsp.stop_client(client.id)
+      --       lspconfig.volar.setup()
+      --       print 'Switched to volar (Vue 3)'
+      --       return
+      --     end
+      --   end
+      --   -- Default to volar if no LSP client is found
+      --   lspconfig.volar.setup()
+      --   print 'Started volar (Vue 3)'
+      -- end
+      --
+      -- -- Command to toggle between volar and vuels
+      -- vim.api.nvim_create_user_command('ToggleVueLSP', toggle_vue_lsp, {})
+      -- vim.keymap.set('n', '<leader>tv', toggle_vue_lsp, { desc = '[T]oggle [V]ue LSP (volar <-> vetur)', noremap = true, silent = true })
     end,
   },
 
@@ -644,14 +703,19 @@ require('lazy').setup({
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = true, cpp = true }
-        return {
-          timeout_ms = 500,
-          lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
-        }
+        --
+        -- I disabled it.
+        -- local disable_filetypes = { c = true, cpp = true }
+        -- return {
+        --   timeout_ms = 500,
+        --   lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
+        -- }
       end,
       formatters_by_ft = {
         lua = { 'stylua' },
+        javascript = { 'prettierd' },
+        typescript = { 'prettierd' },
+        vue = { 'prettierd' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
@@ -784,7 +848,7 @@ require('lazy').setup({
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+      vim.cmd.colorscheme 'tokyonight'
 
       -- You can configure highlights by doing something like:
       vim.cmd.hi 'Comment gui=none'
@@ -829,6 +893,7 @@ require('lazy').setup({
 
       -- ... and there is more!
       --  Check out: https://github.com/echasnovski/mini.nvim
+      -- require('mini.bufremove').setup()
     end,
   },
   { -- Highlight, edit, and navigate code
@@ -874,18 +939,18 @@ require('lazy').setup({
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
   -- require 'kickstart.plugins.debug',
-  -- require 'kickstart.plugins.indent_line',
-  -- require 'kickstart.plugins.lint',
-  -- require 'kickstart.plugins.autopairs',
-  -- require 'kickstart.plugins.neo-tree',
-  -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
+  require 'kickstart.plugins.indent_line',
+  require 'kickstart.plugins.lint',
+  require 'kickstart.plugins.autopairs',
+  require 'kickstart.plugins.neo-tree',
+  require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
-  -- { import = 'custom.plugins' },
+  { import = 'custom.plugins' },
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
