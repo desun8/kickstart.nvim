@@ -642,7 +642,7 @@ require('lazy').setup({
           },
         },
         volar = {},
-        -- vuels = {},
+        vuels = {},
       }
 
       local function tailwindcss_config_exists()
@@ -662,6 +662,58 @@ require('lazy').setup({
       if tailwindcss_config_exists() then
         servers['tailwindcss'] = {}
       end
+
+      -- Функция для определения версии Vue
+      local function is_vue2_project()
+        local uv = vim.loop
+        local paths_to_check = {
+          vim.fn.getcwd() .. '/package.json', -- Корень проекта
+          vim.fn.getcwd() .. '/app/package.json', -- Директория app
+        }
+
+        for _, path in ipairs(paths_to_check) do
+          if uv.fs_stat(path) then
+            local package_json = vim.fn.json_decode(vim.fn.readfile(path))
+            if package_json.dependencies and package_json.dependencies.vue then
+              local vue_version = package_json.dependencies.vue
+              if vue_version:match '^2%.' then
+                return true
+              end
+            end
+          end
+        end
+
+        return false
+      end
+
+      -- Функция для остановки LSP клиента по его имени
+      local function stop_lsp_client(server_name)
+        for _, client in pairs(vim.lsp.get_clients()) do
+          if client.name == server_name then
+            vim.lsp.stop_client(client.id)
+          end
+        end
+      end
+
+      -- Функции для ручного переключения LSP
+      local function setup_volar()
+        stop_lsp_client 'vuels' -- Отключаем vuels, если он активен
+        require('lspconfig').volar.setup {
+          -- Настройки volar
+        }
+        print 'Volar is activated'
+      end
+
+      local function setup_vuels()
+        stop_lsp_client 'volar' -- Отключаем volar, если он активен
+        require('lspconfig').vuels.setup {
+          -- Настройки vuels
+        }
+        print 'Vuels is activated'
+      end
+      -- Команды для ручного переключения LSP серверов
+      vim.api.nvim_create_user_command('UseVolar', setup_volar, {})
+      vim.api.nvim_create_user_command('UseVuels', setup_vuels, {})
 
       -- Ensure the servers and tools above are installed
       --  To check the current status of installed tools and/or manually install
@@ -690,36 +742,22 @@ require('lazy').setup({
             -- by the server configuration above. Useful when disabling
             -- certain features of an LSP (for example, turning off formatting for tsserver)
             server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-            require('lspconfig')[server_name].setup(server)
+            if server_name == 'volar' or server_name == 'vuels' then
+              if is_vue2_project() then
+                if server_name == 'vuels' then
+                  require('lspconfig')[server_name].setup(server)
+                end
+              else
+                if server_name == 'volar' then
+                  require('lspconfig')[server_name].setup(server)
+                end
+              end
+            else
+              require('lspconfig')[server_name].setup(server)
+            end
           end,
         },
       }
-
-      -- local function toggle_vue_lsp()
-      --   local lspconfig = require 'lspconfig'
-      --   local bufnr = vim.api.nvim_get_current_buf()
-      --   local clients = vim.lsp.get_clients { bufnr = bufnr }
-      --   for _, client in ipairs(clients) do
-      --     if client.name == 'volar' then
-      --       vim.lsp.stop_client(client.id)
-      --       lspconfig.vuels.setup()
-      --       print 'Switched to vuels (Vue 2)'
-      --       return
-      --     elseif client.name == 'vuels' then
-      --       vim.lsp.stop_client(client.id)
-      --       lspconfig.volar.setup()
-      --       print 'Switched to volar (Vue 3)'
-      --       return
-      --     end
-      --   end
-      --   -- Default to volar if no LSP client is found
-      --   lspconfig.volar.setup()
-      --   print 'Started volar (Vue 3)'
-      -- end
-      --
-      -- -- Command to toggle between volar and vuels
-      -- vim.api.nvim_create_user_command('ToggleVueLSP', toggle_vue_lsp, {})
-      -- vim.keymap.set('n', '<leader>tv', toggle_vue_lsp, { desc = '[T]oggle [V]ue LSP (volar <-> vetur)', noremap = true, silent = true })
     end,
   },
 
