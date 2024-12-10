@@ -1,0 +1,20 @@
+{
+  "name": "my_snippets",
+  "contributes": {
+    "snippets": [
+      {
+        "language": [
+          "vue"
+        ],
+        "path": "./vue.json"
+      },
+      {
+        "language": [
+          "vue",
+          "css"
+        ],
+        "path": "./css.json"
+      }
+    ]
+  }
+}

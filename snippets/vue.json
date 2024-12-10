@@ -1,0 +1,83 @@
+{
+  "Vue create": {
+    "prefix": "cvc",
+    "body": [
+      "<script setup lang=\"ts\">",
+      "import { toRefs } from 'vue';",
+      "",
+      "interface ${TM_FILENAME_BASE}Props {",
+      "\t $1",
+      "}",
+      "",
+      "const props = withDefaults(defineProps<${TM_FILENAME_BASE}Props>(), {",
+      "\t $2",
+      "});",
+      "const { $3 } = toRefs(props);",
+      "",
+      "$4",
+      "</script>",
+      "",
+      "<template>",
+      "  <div :class=\"cls.$TM_FILENAME_BASE\"></div>",
+      "</template>",
+      "",
+      "<style module=\"cls\">",
+      "  .$TM_FILENAME_BASE {}",
+      "</style>",
+      ""
+    ],
+    "description": "create vue component"
+  },
+    "Nuxt create": {
+    "prefix": "cnxc",
+    "body": [
+      "<script setup lang=\"ts\">",
+      "",
+      "interface ${TM_FILENAME_BASE}Props {",
+      "\t $1",
+      "}",
+      "",
+      "const props = defineProps<${TM_FILENAME_BASE}Props>();",
+      "",
+      "$4",
+      "</script>",
+      "",
+      "<template>",
+      "  <div :class=\"cls.$TM_FILENAME_BASE\"></div>",
+      "</template>",
+      "",
+      "<style module=\"cls\">",
+      "  .$TM_FILENAME_BASE {}",
+      "</style>",
+      ""
+    ],
+    "description": "create nuxt component"
+  },
+  "Nuxt create withDefaults": {
+    "prefix": "cnxc-withDefaults",
+    "body": [
+      "<script setup lang=\"ts\">",
+      "",
+      "interface ${TM_FILENAME_BASE}Props {",
+      "\t $1",
+      "}",
+      "",
+      "const props = withDefaults(defineProps<${TM_FILENAME_BASE}Props>(), {",
+      "\t $2",
+      "});",
+      "",
+      "$4",
+      "</script>",
+      "",
+      "<template>",
+      "  <div :class=\"cls.$TM_FILENAME_BASE\"></div>",
+      "</template>",
+      "",
+      "<style module=\"cls\">",
+      "  .$TM_FILENAME_BASE {}",
+      "</style>",
+      ""
+    ],
+    "description": "create nuxt component withDefaults"
+  }
+}
