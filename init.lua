@@ -641,6 +641,18 @@ require('lazy').setup({
             lookupFiles = { '**/variables/*.css' },
           },
         },
+        ts_ls = {
+          init_options = {
+            plugins = {
+              {
+                name = '@vue/typescript-plugin',
+                location = require('mason-registry').get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server',
+                languages = { 'vue' },
+              },
+            },
+          },
+          filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
+        },
         volar = {},
         vuels = {},
       }
@@ -714,6 +726,21 @@ require('lazy').setup({
       -- Команды для ручного переключения LSP серверов
       vim.api.nvim_create_user_command('UseVolar', setup_volar, {})
       vim.api.nvim_create_user_command('UseVuels', setup_vuels, {})
+
+      -- Работает с nvim-lspconfig < v1.0.0
+      -- local vue_language_server_path = require('mason-registry').get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server'
+      -- require('lspconfig').ts_ls.setup {
+      --   init_options = {
+      --     plugins = {
+      --       {
+      --         name = '@vue/typescript-plugin',
+      --         location = vue_language_server_path,
+      --         languages = { 'vue' },
+      --       },
+      --     },
+      --   },
+      --   filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
+      -- }
 
       -- Ensure the servers and tools above are installed
       --  To check the current status of installed tools and/or manually install

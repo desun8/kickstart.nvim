@@ -45,4 +45,36 @@ return {
       }
     end,
   },
+  -- Работает с nvim-lspconfig < v1.0.0
+  -- {
+  --   'pmizio/typescript-tools.nvim',
+  --   dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
+  --   config = function()
+  --     -- Когда/если появится поддержка кастомных путей
+  --     -- local mason_registry = require 'mason-registry'
+  --     -- local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server'
+  --
+  --     require('typescript-tools').setup {
+  --       filetypes = {
+  --         'typescript',
+  --         'javascript',
+  --         'typescriptreact',
+  --         'javascriptreact',
+  --         'vue',
+  --       },
+  --       settings = {
+  --         tsserver_plugins = {
+  --           -- Устaновил глобально
+  --           '@vue/typescript-plugin',
+  --           -- Нет поддержки кастомных путей :(
+  --           -- {
+  --           --   name = '@vue/typescript-plugin',
+  --           --   location = vue_language_server_path,
+  --           --   languages = { 'vue' },
+  --           -- },
+  --         },
+  --       },
+  --     }
+  --   end,
+  -- },
 }
