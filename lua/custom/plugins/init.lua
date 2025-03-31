@@ -5,20 +5,23 @@
 
 local os_utils = require 'custom.utils.os_utils'
 
-return {
-  -- Sync theme with system colorscheme (ligh/dark)
-  os_utils.is_mac()
-    and {
-      'cormacrelf/dark-notify',
-      config = function()
-        require('dark_notify').run {
-          onchange = function(mode)
-            vim.cmd.colorscheme 'tokyonight'
-          end,
-        }
-      end,
-    },
-  os_utils.is_linux() and {
+local plugins = {}
+
+if os_utils.is_mac() then
+  table.insert(plugins, {
+    'cormacrelf/dark-notify',
+    config = function()
+      require('dark_notify').run {
+        onchange = function(mode)
+          vim.cmd.colorscheme 'tokyonight'
+        end,
+      }
+    end,
+  })
+end
+
+if os_utils.is_linux() then
+  table.insert(plugins, {
     'f-person/auto-dark-mode.nvim',
     opts = {
       update_interval = 1000,
@@ -31,37 +34,7 @@ return {
         vim.cmd 'colorscheme tokyonight-day'
       end,
     },
-  },
-  -- Работает с nvim-lspconfig < v1.0.0
-  -- {
-  --   'pmizio/typescript-tools.nvim',
-  --   dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
-  --   config = function()
-  --     -- Когда/если появится поддержка кастомных путей
-  --     -- local mason_registry = require 'mason-registry'
-  --     -- local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server'
-  --
-  --     require('typescript-tools').setup {
-  --       filetypes = {
-  --         'typescript',
-  --         'javascript',
-  --         'typescriptreact',
-  --         'javascriptreact',
-  --         'vue',
-  --       },
-  --       settings = {
-  --         tsserver_plugins = {
-  --           -- Устaновил глобально
-  --           '@vue/typescript-plugin',
-  --           -- Нет поддержки кастомных путей :(
-  --           -- {
-  --           --   name = '@vue/typescript-plugin',
-  --           --   location = vue_language_server_path,
-  --           --   languages = { 'vue' },
-  --           -- },
-  --         },
-  --       },
-  --     }
-  --   end,
-  -- },
-}
+  })
+end
+
+return plugins
